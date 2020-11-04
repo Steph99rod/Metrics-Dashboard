@@ -6,6 +6,15 @@ import pandas as pd
 from flask import Flask, g, render_template
 from contextlib import closing
 
+
+'''
+TODO: put all tables into a master table?
+for path, subdirs, files in os.walk("../../../Metrics-Dashboard"):
+    for name in files:
+        if name.lower().endswith(".db"):
+            ...
+'''
+
 # Extracting name from args
 dbname = sys.argv[1].split("/")[-1]
 
