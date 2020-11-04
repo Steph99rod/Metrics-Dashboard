@@ -17,6 +17,7 @@ for path, subdirs, files in os.walk("../../../Metrics-Dashboard"):
 
 # Extracting name from args
 dbname = sys.argv[1].split("/")[-1]
+print(dbname)
 
 
 # create our little application :)
@@ -52,12 +53,12 @@ def stacked_bar_chart():
 
     date = df["date"].values.tolist()  # x axis
     commits = df["commits"].values.tolist()
-    # issues = df["issues"].values.tolist()
-    # lines_of_code = df["lines_of_code"].values.tolist()
-    # issue_spoilage_avg = df["issue_spoilage_avg"].values.tolist()
+    issues = df["issues"].values.tolist()
+    lines_of_code = df["lines_of_code"].values.tolist()
+    issue_spoilage_avg = df["issue_spoilage_avg"].values.tolist()
     # issue_spoilage_min = df['issue_spoilage_min'].values.tolist()
-    # issue_spoilage_max = df['issue_spoilage_max'].values.tolist()
-    # defect_density = df["defect_density"].values.tolist()
+    # issue_spoilage_max = df["issue_spoilage_max"].values.tolist()
+    defect_density = df["defect_density"].values.tolist()
 
     return render_template(
         "linegraph.html",

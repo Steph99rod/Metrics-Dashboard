@@ -1,7 +1,7 @@
 from sqlite3 import Cursor, Connection  # Need these for determining type
-import Commits.Code.Master as Master
-from Commits.Code.TokenHandler import TokenHandler
-import Commits.Code.sqlite_database as sqlite_database
+import Master as Master
+from TokenHandler import TokenHandler
+import sqlite_database as sqlite_database
 import sys
 
 

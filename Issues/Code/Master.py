@@ -63,11 +63,11 @@ Calls classes and methods to analyze and interpret data.
             rows = self.dbCursor.fetchall()
             issues = rows[0][0]
 
-            sql = "INSERT INTO MASTER (date, issues) VALUES (?,?) ON CONFLICT(date) DO UPDATE SET issues = (?);"
-            self.dbCursor.execute(
-                sql, (date, str(issues), str(issues)))
-
-            self.dbConnection.commit()
+            # sql = "INSERT INTO MASTER (date, issues) VALUES (?,?) ON CONFLICT(date) DO UPDATE SET issues = (?);"
+            # self.dbCursor.execute(
+            #     sql, (date, str(issues), str(issues)))
+            #
+            # self.dbConnection.commit()
 
     def generate_DateTimeList(self, rCDT: datetime) -> list:
         '''

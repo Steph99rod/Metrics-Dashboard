@@ -1,5 +1,8 @@
 import os
 
+"""
+Class to handle token usage
+"""
 class TokenHandler:
 
     def __init__(self):
@@ -15,13 +18,13 @@ class TokenHandler:
         keysfile.writelines(token + "\n")
         keysfile.close()
 
-    def writelines(self, data:list=None, mode:str="a+")    ->  None:
+    def writelines(self, data:list=None, mode:str="a+") ->  None:
         keysfile = open(self.filename, mode)
         for item in data:
             keysfile.write(item + "\n")
         keysfile.close()
 
-    def read(self)    ->  list:
+    def read(self) ->  list:
         keysfile = open(self.filename, "r") # Opens the file in read mode
         foo = keysfile.readlines()
         keysfile.close()

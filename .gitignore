@@ -444,3 +444,6 @@ database/
 
 # DB files
 #*.db
+
+# Sphinx build directory
+build

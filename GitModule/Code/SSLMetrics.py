@@ -53,7 +53,11 @@ def main():
     os.system(f"mkdir {pDir}")
     os.chdir(pDir)
     os.system("git clone https://" + repo_address + " >/dev/null 2>&1")
-    os.chdir(githubRepo)
+    try:
+        os.chdir(githubRepo)
+    except FileNotFoundError:
+        os.mkdir(githubRepo)
+        os.chdir(githubRepo)
 
     hashes = os.popen('git log --format="%H"').read().split("\n")[0:-1]
     line_counts = dict.fromkeys(hashes, [None, None, None, None, None])

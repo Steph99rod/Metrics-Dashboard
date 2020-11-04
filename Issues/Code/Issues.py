@@ -9,12 +9,12 @@ This is logic to analyze the data from the githubAPI Issues Request API and stor
 
     def __init__(self, gha: GitHubAPI= None, data: dict = None, responseHeaders: tuple = None, cursor: Cursor = None, connection: Connection = None):
         '''
-Initializes the class and sets class variables that are to be used only in this class instance.\n
-:param gha: An instance of the githubAPI class.\n
-:param data: The dictionary of data that is returned from the API call.\n
-:param responseHeaders: The dictionary of data that is returned with the API call.\n
-:param cursor: The database cursor.\n
-:param connection: The database connection.
+    Initializes the class and sets class variables that are to be used only in this class instance.\n
+    :param gha: An instance of the githubAPI class.\n
+    :param data: The dictionary of data that is returned from the API call.\n
+    :param responseHeaders: The dictionary of data that is returned with the API call.\n
+    :param cursor: The database cursor.\n
+    :param connection: The database connection.
         '''
         self.gha = gha
         self.data = data
@@ -26,6 +26,17 @@ Initializes the class and sets class variables that are to be used only in this 
         '''
 Actually scrapes, sanitizes, and stores the data returned from the API call.
         '''
+        def tryParam(getData):
+            ''' Handles try and except while parsing data ''' 
+
+            try:
+                return getData
+            except (KeyError,AttributeError):
+                return None
+
+        def callTryParam(data):
+            ''' sets data to 'NA' if parsing fails '''
+            return tryParam(data) if tryParam(data) is not None else "NA"
         while True:
             if len(self.data) == 0:
                 break
@@ -58,126 +69,32 @@ Actually scrapes, sanitizes, and stores the data returned from the API call.
                 comment_updated_at = "NA"
                 comment_body = "NA"
 
-                try:
-                    user = x["user"]["login"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-
-                try:
-                    user_id = x["user"]["id"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-
-                try:
-                    issue_id = x["id"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-                try:
-                    comments_url = x["comments_url"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-
-                try:
-                    node_id = x["node_id"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-                
-                try:
-                    number = x["number"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-
-                try:
-                    title = x["title"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-                
-                try:
-                    labels = x["labels"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-                
-                try:
-                    state = x["state"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-
-                try:
-                    locked = x["locked"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-                try:
-                    assignee = x["assignee"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-
-                try:
-                    assignees = x["assignees"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-                
-                try:
-                    comments = x["comments"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-
-                try:
-                    body = x["body"]
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
+                user = callTryParam(x["user"]["login"])
+                user_id = callTryParam(x["user"]["id"])
+                issue_id = callTryParam(x["id"])
+                comments_url = callTryParam(x["comments_url"])
+                node_id = callTryParam(x["node_id"])
+                number = callTryParam(x["number"])
+                title = callTryParam(x["title"])
+                labels = callTryParam(x["labels"])
+                state = callTryParam(x["state"])
+                locked = callTryParam(x["locked"])
+                assignee = callTryParam(x["assignee"])
+                assignees = callTryParam(x["assignees"])
+                comments = callTryParam(x["comments"])
+                body = callTryParam(x["body"])
                 # Scrapes and sanitizes the time related data
-                try:
-                    closed_at = x["closed_at"].replace("T", " ").replace("Z", " ")
-                    closed_at = datetime.strptime(closed_at, "%Y-%m-%d %H:%M:%S ")
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-                
-                try:
-                    created_at = x["created_at"].replace("T", " ").replace("Z", " ")
-                    created_at = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S ")
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-
-                try:
-                    updated_at = x["updated_at"].replace("T", " ").replace("Z", " ")
-                    updated_at = datetime.strptime(updated_at, "%Y-%m-%d %H:%M:%S ")
-                except KeyError:
-                    pass
-                except AttributeError:
-                    pass
-
+                # closed_at = callTryParam(x["closed_at"].replace("T", " ").replace("Z", " "))
+                closed_at = callTryParam(x["closed_at"])
+                closed_at = closed_at.replace("T", " ").replace("Z"," ") if closed_at != "NA" else closed_at
+                closed_at = datetime.strptime(closed_at, "%Y-%m-%d %H:%M:%S ") if closed_at != "NA" else closed_at 
+                # created_at = callTryParam(x["created_at"].replace("T", " ").replace("Z", " "))
+                created_at = callTryParam(x["created_at"])
+                created_at = created_at.replace("T", " ").replace("Z", " ") if created_at != "NA" else created_at
+                created_at = datetime.strptime(created_at, "%Y-%m-%d %H:%M:%S ") if created_at != "NA" else created_at
+                updated_at = callTryParam(x["updated_at"])
+                updated_at = updated_at.replace("T", " ").replace("Z", " ") if updated_at != "NA" else updated_at
+                updated_at = datetime.strptime(updated_at, "%Y-%m-%d %H:%M:%S ") if updated_at != "NA" else updated_at
                 # Stores the data into a SQL database
                 sql = "INSERT INTO ISSUES (user, user_id, issue_id, comments_url, node_id, number, title, labels, state, locked, assignee, assignees, comments, created_at, updated_at, closed_at, body, comment_user, comment_user_id, comment_id, issue_url, comment_node_id, comment_created_at, comment_updated_at, comment_body) VALUES (?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?);"
                 self.dbCursor.execute(sql, (str(user), str(user_id), str(issue_id), str(comments_url), str(node_id), str(number), str(title), str(labels), str(state), str(locked), str(assignee), str(assignees), str(comments), str(created_at), str(updated_at), str(

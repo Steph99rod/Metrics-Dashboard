@@ -1,2 +1,7 @@
-requests==2.24.0
-tqdm==4.49.0
+pandas
+sphinx
+sphinx-rtd-theme
+requests
+tqdm
+travis-sphinx
+flask
