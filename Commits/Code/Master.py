@@ -46,7 +46,8 @@ Computing and inserting calculations into the calculations table.
         self.dbCursor.execute(
             "SELECT committer_date FROM COMMITS;")
         date_rows = self.dbCursor.fetchall()
-        
+
+        #--------TODO, move function to a class, in date_rows, return two things: calc_name, 
         # calculate average time between commit
         total_times = []
         total_time_differences = []
@@ -64,10 +65,9 @@ Computing and inserting calculations into the calculations table.
             value = str(sum(total_time_differences) / len(total_time_differences))
         else:
             value = "N/A"
-
         # average time between commits
         calc_name = "Average Time Between Commits (secs)"
-        
+        #--------
         # Stores the data into a SQL database
         sql = "INSERT INTO COMMITS_CALCULATIONS (calc_name, value) VALUES (?,?);"
         self.dbCursor.execute(
