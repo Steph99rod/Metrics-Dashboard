@@ -2,6 +2,7 @@ from datetime import datetime, timedelta
 from githubAPI import GitHubAPI
 from sqlite3 import Cursor, Connection
 import Commits
+import CommitsCalculations 
 
 class Logic:
     '''
@@ -41,44 +42,11 @@ Computing and inserting calculations into the calculations table.
         # Gets and stores data from the commits api endpoint
         self.set_Data(endpoint="commits")
         Commits.Logic(gha=self.gha, data=self.data[0], responseHeaders=self.data[1],cursor=self.dbCursor, connection=self.dbConnection).parser()
-    
-        # get all the times from the commits table
-        self.dbCursor.execute(
-            "SELECT committer_date FROM COMMITS;")
-        date_rows = self.dbCursor.fetchall()
 
-        #--------TODO, move function to a class, in date_rows, return two things: calc_name, 
-        # calculate average time between commit
-        total_times = []
-        total_time_differences = []
-        for row in date_rows:
-            date = datetime.strptime(
-            row[0], "%Y-%m-%d %H:%M:%S")
-            total_times.append(date)
+        cc = CommitsCalculations.CommitsCalculations(self.dbCursor, self.dbConnection)
+        cc.calc_average_time_between_commits()
+        cc.calc_commits_per_hour()
 
-        # only if the list is greater than two 
-        if len(total_times) >= 2:
-            for t in range(len(total_times)-1):
-                time_difference  = abs(total_times[t] - total_times[t+1])
-                total_time_differences.append(time_difference.total_seconds())
-            
-            value = str(sum(total_time_differences) / len(total_time_differences))
-        else:
-            value = "N/A"
-        # average time between commits
-        calc_name = "Average Time Between Commits (secs)"
-        #--------
-        # Stores the data into a SQL database
-        sql = "INSERT INTO COMMITS_CALCULATIONS (calc_name, value) VALUES (?,?);"
-        self.dbCursor.execute(
-        sql,
-        (
-            str(calc_name),
-            str(value)
-        ),
-    )
-
-        self.dbConnection.commit()
 
     def generate_DateTimeList(self, rCDT: datetime) -> list:
         '''
