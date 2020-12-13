@@ -6,28 +6,28 @@ docker volume create metrics
 
 # Run Commits
 cd Commits
-./CommitsModule.sh $1 $2
+./CommitsModule.sh $1 $2 $3
 cd ..
 
 # Run Issues
-cd Issues
-./IssuesModule.sh $1 $2
-cd ..
+# cd Issues
+# ./IssuesModule.sh $1 $2 $3
+# cd ..
 
 # Run GitModule
-cd GitModule
-./GitModule.sh $1
-cd ..
+# cd GitModule
+# ./GitModule.sh $1 $2
+# cd ..
 
 # Run Issue_Spoilage
-cd Issue_Spoilage
-./IssueSpoilageModule.sh $1 $2
-cd ..
+# cd Issue_Spoilage
+# ./IssueSpoilageModule.sh $1 $2 $3
+# cd ..
 
 # Run Defect Density (this command should also copy volume content to the current dir)
-cd Defect_Density
-./DefectDensityModule.sh $1 $2
-cd ..
+# cd Defect_Density
+# ./DefectDensityModule.sh $1 $2 $3
+# cd ..
 
 # Run Graph
 cd Graph

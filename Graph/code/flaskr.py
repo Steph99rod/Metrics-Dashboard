@@ -16,8 +16,10 @@ for path, subdirs, files in os.walk("../../../Metrics-Dashboard"):
 '''
 
 # Extracting name from args
-dbname = sys.argv[1].split("/")[-1]
-print(dbname)
+##dbname = sys.argv[1].split("/")[-1]
+with open("TestTestDatabase.db", "r") as foo:
+    print("Hello World")
+    foo.close()
 
 
 # create our little application :)
@@ -26,7 +28,7 @@ app = Flask(__name__)
 # configuration
 app.config.update(
     dict(
-        DATABASE=str(dbname),
+        DATABASE=str("TestTestDatabase.db"),
     )
 )
 
@@ -44,28 +46,30 @@ def init_db():
 def stacked_bar_chart():
     # Read query results into a pandas DataFrame
     con = connect_db()
-    df = pd.read_sql_query("SELECT * from MASTER ORDER BY date ASC", con)
+    df = pd.read_sql_query("SELECT * from Calculations ORDER BY date DESC", con)
+    # df = data[0:1]
 
     # verify that result of SQL query is stored in the dataframe
     print(df.to_json())
 
     con.close()
 
-    date = df["date"].values.tolist()  # x axis
-    commits = df["commits"].values.tolist()
-    issues = df["issues"].values.tolist()
-    lines_of_code = df["lines_of_code"].values.tolist()
-    issue_spoilage_avg = df["issue_spoilage_avg"].values.tolist()
+    date = df["Date"].values.tolist()  # x axis
+    defect_density = df["Defect Density"].values.tolist()
+    commits = df["Commits per Week"].values.tolist()
+    #issues = df["issues"].values.tolist()
+    #lines_of_code = df["lines_of_code"].values.tolist()
+    issue_spoilage_avg = df["Issue Spoilage"].values.tolist()
     # issue_spoilage_min = df['issue_spoilage_min'].values.tolist()
     # issue_spoilage_max = df["issue_spoilage_max"].values.tolist()
-    defect_density = df["defect_density"].values.tolist()
+   
 
     return render_template(
-        "linegraph.html",
+        "charts.html",
         date=date,
         commits=commits,
-        issues=issues,
-        lines_of_code=lines_of_code,
+       # issues=issues,
+       # lines_of_code=lines_of_code,
         defect_density=defect_density,
         issue_spoilage_avg=issue_spoilage_avg,
     )

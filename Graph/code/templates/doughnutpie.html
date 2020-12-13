@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Doughnut Chart</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+</head>
+<body>
+  <canvas id="myChart1" width="1000" height="400"></canvas>
+  <canvas id="myChart2" width="1000" height="400"></canvas>
+ <canvas id="myChart3" width="1000" height="400"></canvas>
+  <!-- <canvas id="myChart4" width="1000" height="400"></canvas>
+  <canvas id="myChart5" width="1000" height="400"></canvas>
+  <canvas id="myChart6" width="1000" height="400"></canvas>
+  <canvas id="myChart7" width="1000" height="400"></canvas>
+  <canvas id="myChart8" width="1000" height="400"></canvas>
+  <canvas id="myChart9" width="1000" height="400"></canvas> -->
+  <style>
+     #myChart1, #myChart2, #myChart3, #myChart4, #myChart5, #myChart6, #myChart7, #myChart8, #myChart9 {
+        width:100%;
+    }
+  </style>
+
+  <script>
+    // Get the context of the canvas element we want to select
+    var ctx1 = document.getElementById("myChart1").getContext("2d");
+    // var ctx2 = document.getElementById("myChart2").getContext("2d");
+    // var ctx3 = document.getElementById("myChart3").getContext("2d");
+    // var ctx4 = document.getElementById("myChart4").getContext("2d");
+    // var ctx5 = document.getElementById("myChart5").getContext("2d");
+    // var ctx6 = document.getElementById("myChart6").getContext("2d");
+    // var ctx7 = document.getElementById("myChart7").getContext("2d");
+    // var ctx8 = document.getElementById("myChart8").getContext("2d");
+    // var ctx9 = document.getElementById("myChart9").getContext("2d");
+
+    var date = {{date|safe}};
+    var commits = {{commits|safe}};
+    // var issues = {{issues|safe}};
+    var defect_density = {{defect_density|safe}};
+    var issue_spoilage_avg = {{issue_spoilage_avg|safe}};
+    // var lines_of_code  = {{lines_of_code|safe}};
+
+    // generates random colors from hex values
+    function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+        }
+    return color;
+    }
+    // assigned colors for each of the metrics
+    randomColorC = getRandomColor()
+    randomColorI = getRandomColor()
+    randomColorDD = getRandomColor()
+    randomColorISA = getRandomColor()
+    randomColorLOC = getRandomColor()
+
+
+    var myChart1 = new Chart(ctx1, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [commits[0], defect_density[0], issue_spoilage_avg[0]],
+                backgroundColor: [randomColorC, randomColorDD, randomColorISA]
+            }],
+            labels: ['Commits', 'Defect Density', 'Issue Spoilage'],
+        },
+        options: {
+            scales: {
+            }
+        }
+        
+    });
+
+  </script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Metrics Charts</title>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.9.3/Chart.bundle.js"></script>
+</head>
+<body>
+  <h2>Line Graph</h2>
+  <canvas id="myChart1" width="1000" height="400"></canvas>
+  <br>
+  <h2>Doughnut Chart</h2>
+  <canvas id="myChart2" width="1000" height="400"></canvas>
+  <br>
+  <h2>Polar Area Chart</h2>
+ <canvas id="myChart3" width="1000" height="400"></canvas>
+  <br>
+  <h2>Radar Chart</h2>
+  <canvas id="myChart4" width="1000" height="400"></canvas>
+  <!-- <canvas id="myChart5" width="1000" height="400"></canvas>
+  <canvas id="myChart6" width="1000" height="400"></canvas>
+  <canvas id="myChart7" width="1000" height="400"></canvas>
+  <canvas id="myChart8" width="1000" height="400"></canvas>
+  <canvas id="myChart9" width="1000" height="400"></canvas> -->
+  <style>
+     #myChart1, #myChart2, #myChart3, #myChart4, #myChart5, #myChart6, #myChart7, #myChart8, #myChart9 {
+        width:100%;
+    }
+  </style>
+
+  <script>
+    // Get the context of the canvas element we want to select
+    var ctx1 = document.getElementById("myChart1").getContext("2d");
+    var ctx2 = document.getElementById("myChart2").getContext("2d");
+    var ctx3 = document.getElementById("myChart3").getContext("2d");
+    var ctx4 = document.getElementById("myChart4").getContext("2d");
+    // var ctx5 = document.getElementById("myChart5").getContext("2d");
+    // var ctx6 = document.getElementById("myChart6").getContext("2d");
+    // var ctx7 = document.getElementById("myChart7").getContext("2d");
+    // var ctx8 = document.getElementById("myChart8").getContext("2d");
+    // var ctx9 = document.getElementById("myChart9").getContext("2d");
+
+    var date = {{date|safe}};
+    var commits = {{commits|safe}};
+    // var issues = {{issues|safe}};
+    var defect_density = {{defect_density|safe}};
+    var issue_spoilage_avg = {{issue_spoilage_avg|safe}};
+    // var lines_of_code  = {{lines_of_code|safe}};
+
+    // generates random colors from hex values
+    function getRandomColor() {
+    var letters = '0123456789ABCDEF';
+    var color = '#';
+    for (var i = 0; i < 6; i++) {
+        color += letters[Math.floor(Math.random() * 16)];
+        }
+    return color;
+    }
+    // assigned colors for each of the metrics
+    randomColorC = getRandomColor()
+    randomColorI = getRandomColor()
+    randomColorDD = getRandomColor()
+    randomColorISA = getRandomColor()
+    randomColorLOC = getRandomColor()
+
+
+    var myChart1 = new Chart(ctx1, {
+        type: 'line',
+        data: {
+            labels: date,
+            datasets: [{
+                label: "Commits per Week",
+                borderColor: randomColorC,
+                strokeColor: randomColorC,
+                pointColor: randomColorC,
+                pointHoverBorderColor: randomColorC,
+                pointHoverBackgroundColor: "rgba(75, 192, 192, 0.2)",
+                fill:false,
+                data: commits
+            }, 
+            {
+                label: "Defect Density",
+                borderColor: randomColorDD,
+                strokeColor: randomColorDD,
+                pointColor: randomColorDD,
+                pointHoverBorderColor: randomColorDD,
+                pointHoverBackgroundColor: "rgba(75, 192, 192, 0.2)",
+                fill:false,
+                data: defect_density
+            },
+            {
+                label: 'Issue Spoilage',
+                borderColor: randomColorISA,
+                strokeColor: randomColorISA,
+                pointColor: randomColorISA,
+                pointHoverBorderColor: randomColorISA,
+                pointHoverBackgroundColor: "rgba(75, 192, 192, 0.2)",
+                fill:false,
+                data: issue_spoilage_avg
+            }]
+            },
+        options: {
+            scales: {
+                xAxes: [{
+                    distribution: 'series',
+                    type: 'time',
+                    time: {
+                        parser: 'YYYY-MM-DD HH:mm:ss',
+                        unit: 'month',
+                        displayFormats: {
+                            'month': 'YYYY MMM DD',
+                            'year': 'YYYY MMM DD'
+                        }
+                    },
+                    scaleLabel: {
+                            display: true,
+                            labelString: 'Date'
+                        },
+                    ticks: {
+                        source: 'auto'
+                    }
+                      }],
+            
+                yAxes: [{
+                        scaleLabel: {
+                        display: true,
+                        labelString: 'Number of Commits'
+                        }
+                    }]
+                }
+            }
+        
+    });
+
+
+    var myChart2 = new Chart(ctx2, {
+        type: 'doughnut',
+        data: {
+            datasets: [{
+                data: [commits[0], defect_density[0], issue_spoilage_avg[0]],
+                backgroundColor: [randomColorC, randomColorDD, randomColorISA]
+            }],
+            labels: ['Commits', 'Defect Density', 'Issue Spoilage'],
+        },
+        options: {
+            scales: {
+            }
+        }
+    });
+
+    var myChart3 = new Chart(ctx3, {
+        type: 'polarArea',
+        data: {
+            datasets: [{
+                data: [commits[0], defect_density[0], issue_spoilage_avg[0]],
+                backgroundColor: [randomColorC, randomColorDD, randomColorISA]
+            }],
+            labels: ['Commits', 'Defect Density', 'Issue Spoilage'],
+        },
+        options: {
+            scales: {
+            }
+        }
+    });
+
+    var myChart4 = new Chart(ctx4, {
+        type: 'radar',
+        data: {
+            labels: ['Commits', 'Defect Density', 'Issue Spoilage'],
+            datasets: [{
+                label: "Branch 1",
+                data: [commits[0], defect_density[0], issue_spoilage_avg[0]],
+                borderColor: randomColorLOC,
+                strokeColor: randomColorLOC,
+                pointColor: randomColorLOC,
+                pointHoverBorderColor: randomColorLOC,
+                pointHoverBackgroundColor: "rgba(75, 192, 192, 0.2)",
+                fill: true,
+            }]
+            // datasets: [{
+            //     label: "Person 1",
+            //     borderColor: randomColorC,
+            //     strokeColor: randomColorC,
+            //     pointColor: randomColorC,
+            //     pointHoverBorderColor: randomColorC,
+            //     pointHoverBackgroundColor: "rgba(75, 192, 192, 0.2)",
+            //     fill:false,
+            //     data: commits
+            // }, 
+            // {
+            //     label: "Person 2",
+            //     borderColor: randomColorDD,
+            //     strokeColor: randomColorDD,
+            //     pointColor: randomColorDD,
+            //     pointHoverBorderColor: randomColorDD,
+            //     pointHoverBackgroundColor: "rgba(75, 192, 192, 0.2)",
+            //     fill:false,
+            //     data: defect_density
+            // },
+            // {
+            //     label: 'Person 3',
+            //     borderColor: randomColorI,
+            //     strokeColor: randomColorI,
+            //     pointColor: randomColorI,
+            //     pointHoverBorderColor: randomColorI,
+            //     pointHoverBackgroundColor: "rgba(75, 192, 192, 0.2)",
+            //     fill:false,
+            //     data: issue_spoilage_avg
+            // }]
+        },
+        options: {
+            scales: {
+                angleLines: {
+                    display: false,
+                },
+                
+            }
+        }
+    });
+    // var myChart4 = new Chart(ctx4, {
+    //     type: "line",
+    //     data: {
+    //         labels: date,
+    //         datasets: [{
+    //             label: 'Lines of Code',
+    //             borderColor: randomColorLOC,
+    //             strokeColor: randomColorLOC,
+    //             pointColor: randomColorLOC,
+    //             pointHoverBorderColor: randomColorLOC,
+    //             pointHoverBackgroundColor: "rgba(75, 192, 192, 0.2)",
+    //             fill:false,
+    //             data: lines_of_code
+    //         }]
+    //     },
+    //     options: {
+    //         scales: {
+    //             xAxes: [{
+    //                 distribution: 'series',
+    //                 type: 'time',
+    //                 time: {
+    //                     parser: 'YYYY-MM-DD HH:mm:ss',
+    //                     unit: 'month',
+    //                     displayFormats: {
+    //                         'month': 'YYYY MMM DD',
+    //                         'year': 'YYYY MMM DD'
+    //                     }
+    //                 },
+    //                 scaleLabel: {
+    //                         display: true,
+    //                         labelString: 'Date'
+    //                     },
+    //                 ticks: {
+    //                     source: 'auto'
+    //                 }
+    //                   }],
+    //             yAxes: [{
+    //                     scaleLabel: {
+    //                     display: true,
+    //                     labelString: 'Lines of Code'
+    //                     }
+    //                 }]
+    //             }
+    //         }
+    // });
+
+
+
+  </script>
+</body>
+</html>
