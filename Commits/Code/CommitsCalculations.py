@@ -6,41 +6,37 @@ import sys, os
 import pandas as pd
 
 
-# def main():
-#     # cs371f20p3-stephanie-matt-jakob
-#     args = sys.argv[1:]
-#     cwd = os.getcwd()
-#     print("Database name that was entered: ", args[0])
-#     db= cwd + "/metrics/cs371f20p3-stephanie-matt-jakob.db"
-#     print(db)
-#     conn = sqlite3.connect("/metrics/" + str("cs371f20p3-stephanie-matt-jakob") + ".db")
-#     exit()
-#     dbCursor, dbConnection = sqlite_database.open_connection(args[0]) 
-#     cc = CommitsCalculations(dbCursor, dbConnection)
-#     cc.calc_average_time_between_commits()
-
-
 class CommitsCalculations:
 
     def __init__(self, dbCursor, dbConnection) -> None:
-        '''
-        Initialize class variables
-        :param dbCursor: The db cursour used in Master.py
-        :param dbConnection: The db connection used in Master.py
+        '''Initializes class variables
+        Args:
+            dbCursor: The db cursour used in Master.py
+            dbConnection: The db connection used in Master.py
         '''
         self.dbCursor = dbCursor
         self.dbConnection = dbConnection
 
-    def list_to_string(self, x_list, combinator) -> str:
-        combinator= ", "
-        combinator = combinator.join(x_list)
-        return combinator
+    def list_to_string(self, x_list: list, combinator: str) -> str:
+        ''' Converts a list into a string 
+        Args:
+            x_list: any list of strings
+            combinator: something that will go inbetween each item in the list, ex. a comma
+        Returns:
+            a string 
+        '''
+        output_string = combinator.join(x_list)
+        return output_string
     
     def insert_calc_into_table(self, calc_name, value, unit) -> None:
         '''
-        parameter: calc_name - name of the calculation to be entered into the database
-        parameter: value - number associated with the calculation 
-        paamterer: unit - the unit of the calculated number 
+        Args:
+            calc_name - name of the calculation to be entered into the database
+            value - number associated with the calculation 
+            unit - the unit of the calculated number 
+
+        Returns:
+            None, instead it modifies the existing database
         '''
         # Stores the data into a SQL database
         sql = "INSERT INTO COMMITS_CALCULATIONS (calc_name, value, unit) VALUES (?,?, ?);"
@@ -50,9 +46,15 @@ class CommitsCalculations:
             str(unit)),)
         self.dbConnection.commit()
     
-    def insert_calc_into_table_and_column(self, date, hour, no_of_committs, person) -> None:
-        '''
-        parameter: calc_name - name of the calculation to be entered into the database
+    def insert_calc_into_table_and_column(self, date: str, hour: str, no_of_committs: str, person: str) -> None:
+        ''' Inserts a row into a table. 
+        Args:
+            date - date of the commit in mmddyy format 
+            hour - just the hour of the day, 0-23
+            no_of_committs - the number of commits a person made 
+            person - the person in which the previous arguements apply to 
+        Returns: 
+            None, instead it modifies the table.
         '''
         # Stores the data into a SQL database
         sql = "INSERT INTO COMMITS_CALCULATIONS_HOURLY (commiter_calendar_date, committer_hour, count_of_committs_per_hour, top_committer_per_hour) VALUES (?,?,?,?);"
@@ -97,6 +99,10 @@ class CommitsCalculations:
         self.insert_calc_into_table(calc_name, value, unit)
 
     def calc_commits_per_hour(self) -> None:
+        '''
+        Create calculations on a per hour basis. 
+        If there is no information on the hour of the day, then "none" is placed into that time as a default. 
+        '''
 
         # get all the times from the commits table
         self.dbCursor.execute(
@@ -141,16 +147,3 @@ class CommitsCalculations:
 
         self.insert_calc_into_table("Overall Project Top Committer", overall_top_committer, "")
         self.insert_calc_into_table("Date With Most Committs", date_most_active, "")
-
-    
-
-
-
-
-
-        
-
-
-
-
-# main()
