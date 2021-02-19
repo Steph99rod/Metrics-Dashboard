@@ -1,0 +1,103 @@
+from sqlite3 import Cursor, Connection  # Need these for determining type
+# import Master
+# from TokenHandler import TokenHandler
+import sqlite_database
+import sys
+
+
+class SSLMetrics:
+    '''
+This is what should be called to actually run the SSL Metrics tool.\n
+Call this tool in the command line as: python SSLMetrics.py {GitHub URL} {Optional Token}
+    '''
+
+    def __init__(self) -> None:
+        '''
+Initializes the program and sets class variables that are going to be used as the initial values across the program.\n
+Required command line arguements:\n
+GitHub URL (https://github.com/{Username}/{Repository})\n
+Optional command line arguements:\n
+GitHub Personal Access Token
+        '''
+        self.args = sys.argv[1:]  # All of the command line args excluding the filename
+        # self.githubURL = None
+        # self.githubUser = None
+        # self.githubRepo = None
+        # self.githubToken = None
+        # self.githubTokenList = None # This is pulled from keys.txt
+        self.dbCursor = None  # Database specific variable
+        self.dbConnection = None  # Database specific variables
+        # self.th = TokenHandler()    # Class instance to write and read tokens to tokens.txt
+
+    def parseArgs(self) -> None:
+        '''
+This is a REQUIRED method.\n
+Logic to parse the list of command line arguements to make sure that they meet program requirements.\n
+Will also generate the keys.txt file, get data from it, and potentially write data to it as well.
+        '''
+        # TODO:
+        # Add unit test to check for this function
+        # Add unit test to check the length of args
+        # Add unit test to check for self.githubURL is updated after this function
+        # Add unit test to check if both self.githubURL and self.githubToken are updated after this function
+        # Add unit test to check if self.githubToken is not updated if there is no githubToken after this function
+        if len(self.args) > 2:
+            sys.exit("Too Many Args")
+        try:
+            self.db_input_location = self.args[0]
+        except IndexError:
+            sys.exit("No Database Input Location Arg")
+        try:
+            self.db_input_location = self.args[1]
+        except IndexError:
+            sys.exit("No Database Output Location Arg")
+
+
+
+    def launch(self) -> None:
+        '''
+This is a REQUIRED method.\n
+Logic to actually begin the analysis.
+        '''
+        self.dbCursor, self.dbConnection = sqlite_database.open_connection(self.db_input_location)
+        
+#     def get_Args(self) -> list:
+#         '''
+# Returns the class variable args.
+#         '''
+#         return self.args
+
+#     def get_GitHubURL(self) -> str:
+#         '''
+# Returns the class variable githubURL.
+#         '''
+#         return self.githubURL
+
+#     def get_GitHubUser(self) -> str:
+#         '''
+# Returns the class variable githubUser
+#         '''
+#         return self.githubUser
+
+#     def get_GitHubRepo(self) -> str:
+#         '''
+# Returns the class variable githubRepo.
+#         '''
+#         return self.githubRepo
+
+#     def get_DbCursor(self) -> Cursor:
+#         '''
+# Returns the class variable dbCursor.
+#         '''
+#         return self.dbCursor
+
+#     def get_DbConnection(self) -> Connection:
+#         '''
+# Returns the class variable dbConnection.
+#         '''
+#         return self.dbConnection
+
+s = SSLMetrics()
+s.parseArgs()
+s.launch()
+sys.exit(0)
