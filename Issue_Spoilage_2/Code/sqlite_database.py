@@ -6,9 +6,13 @@ def open_connection(repo_name: str):
     Repo must exist in Metrics-Dashboard/Data-Collection/
     This is some SQL code that creates the tables and columns in a database named after the repository its data is holding.
     '''    
-    # ex: '/Users/steph/Desktop/Code/Metrics/Metrics-Dashboard/Issue_Spoilage_2'
+    # ex: current_cwd = '/Users/name/Desktop/Code/Metrics/Metrics-Dashboard/Issue_Spoilage_2'
     current_cwd = os.getcwd()
+
+    # get the numerical position of the word "Metrics-Dashboard" 
     metrics_folder = current_cwd.find("Metrics-Dashboard")
+
+    # ex: current_cwd = '/Users/name/Desktop/Code/Metrics/Metrics-Dashboard/
     current_cwd = current_cwd[:metrics_folder + len("Metrics-Dashboard")]
 
     # data-collection folder is where the database will come from 
@@ -16,9 +20,7 @@ def open_connection(repo_name: str):
 
     # MetricsDashboard
     try:
-        print("connect ", data_collection_folder + repo_name + ".db")
         connection = sqlite3.connect(data_collection_folder + repo_name + ".db")
-        # print("connect ", data_collection_folder + repo_name + ".db")
     except sqlite3.OperationalError:
         connection = sqlite3.connect(data_collection_folder + repo_name + ".db")
 
