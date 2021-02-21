@@ -1,7 +1,8 @@
 from datetime import datetime, timedelta
-from githubAPI import GitHubAPI
+# from githubAPI import GitHubAPI
 from sqlite3 import Cursor, Connection
 import Issue_Spoilage
+import pandas as pd
 
 # import Lines_Of_Code_And_Num_Of_Chars
 
@@ -11,7 +12,7 @@ This is logic to call all other classes and methods that make the program run.\n
 Does very little analysis of data.
     '''
 
-    def __init__(self, username: str=None, repository:str=None, token:str=None, tokenList:list=None, cursor:Cursor=None, connection:Connection=None) ->  None:
+    def __init__(self, table: pd.DataFrame, cursor:Cursor=None, connection:Connection=None) ->  None:
         '''
 Initalizes the class and sets class variables that are to be used only in this class instance.\n
 :param username: The GitHub username.\n
@@ -23,48 +24,25 @@ Initalizes the class and sets class variables that are to be used only in this c
 :param cursor: The database cursor.\n
 :param connection: The database connection.
         '''
-        # self.githubUser = username
-        # self.githubRepo = repository
-        # self.githubToken = token
-        # self.githubTokenList = tokenList
+
         self.dbCursor = cursor
         self.dbConnection = connection
-        self.data = None
-        self.gha = None
+        self.data = table
+
 
     def program(self) -> None:
         '''
 Calls classes and methods to analyze and interpret data.
         '''
-        # Gets and stores data from the root api endpoint
-        # self.set_Data(endpoint="")
-        
 
-        '''
-        TODO: make self.data equal to the information from the issues table 
-        '''
-        
-
-        repoConcptionDateTime = datetime.strptime(self.data[0]['created_at'].replace("T", " ").replace("Z", ""), "%Y-%m-%d %H:%M:%S")
+        first_time_stamp = self.data.loc[0, "Created_At"].replace("T", " ").replace("Z", "")
+        repoConcptionDateTime = datetime.strptime(first_time_stamp, "%Y-%m-%d %H:%M:%S")
         
         # Index 0 = Current datetime, Index -1 = conception datetime
         datetimeList = self.generate_DateTimeList(rCDT=repoConcptionDateTime)
+        print(datetimeList)
+        exit()
 
-        # Gets and stores data from the commits api endpoint
-        # self.set_Data(endpoint="commits")
-        # Commits.Logic(gha=self.gha, data=self.data[0], responseHeaders=self.data[1],cursor=self.dbCursor, connection=self.dbConnection).parser()
-
-        # # Gets and stores data from the pulls api endpoint
-        # self.set_Data(endpoint="pulls")
-        # Pulls.Logic(gha=self.gha, data=self.data[0], responseHeaders=self.data[1],
-        #             cursor=self.dbCursor, connection=self.dbConnection).parser()
-
-        # # Gets and stores data from the issues api endpoint
-        # self.set_Data(endpoint="issues")
-        # Issues.Logic(gha=self.gha, data=self.data[0], responseHeaders=self.data[1],
-        #              cursor=self.dbCursor, connection=self.dbConnection).parser()
-
-        # Lines_Of_Code_And_Num_Of_Chars.Main(username, repository)
 
         Issue_Spoilage.Main(self.dbCursor, self.dbConnection, datetimeList)
 

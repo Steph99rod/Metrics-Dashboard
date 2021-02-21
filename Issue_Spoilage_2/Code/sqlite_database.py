@@ -8,13 +8,17 @@ def open_connection(repo_name: str):
     '''    
     # ex: '/Users/steph/Desktop/Code/Metrics/Metrics-Dashboard/Issue_Spoilage_2'
     current_cwd = os.getcwd()
-    # ex: '/Users/steph/Desktop/Code/Metrics/Metrics-Dashboard'
-    metrics_dashboard_folder = os.path.dirname(current_cwd)
+    metrics_folder = current_cwd.find("Metrics-Dashboard")
+    current_cwd = current_cwd[:metrics_folder + len("Metrics-Dashboard")]
+
     # data-collection folder is where the database will come from 
-    data_collection_folder  = metrics_dashboard_folder + '/Data-Collection/'
-    
+    data_collection_folder  = current_cwd + '/Data-Collection/'
+
+    # MetricsDashboard
     try:
+        print("connect ", data_collection_folder + repo_name + ".db")
         connection = sqlite3.connect(data_collection_folder + repo_name + ".db")
+        # print("connect ", data_collection_folder + repo_name + ".db")
     except sqlite3.OperationalError:
         connection = sqlite3.connect(data_collection_folder + repo_name + ".db")
 

@@ -1,10 +1,12 @@
 from sqlite3 import Cursor, Connection  # Need these for determining type
-# import Master
+import Conduct_Calculation
 # from TokenHandler import TokenHandler
 import sqlite_database
 import sys
 import pandas as pd 
 
+# have MetricsDashboard as a db in Data-Collection then: 
+# python SSLMetrics.py MetricsDashboard $(pwd)
 
 class SSLMetrics:
     '''
@@ -37,7 +39,7 @@ Will also generate the keys.txt file, get data from it, and potentially write da
         except IndexError:
             sys.exit("No Database Input Location Arg")
         try:
-            self.db_input_location = self.args[1]
+            self.db_output_location = self.args[1]
         except IndexError:
             sys.exit("No Database Output Location Arg")
 
@@ -49,15 +51,26 @@ Logic to actually begin the analysis.
         '''
         self.dbCursor, self.dbConnection = sqlite_database.open_connection(self.db_input_location)
 
-    def obtainIssuesTable(self) -> None:
-        get_issues_table = self.dbCursor.execute("SELECT * FROM Issues")
-        issues_df = pd.Dataframe(get_issues_table.fetchall())
-        issues_df.columns = get_issues_table.keys()
-        print(issues_df)
+    def obtainTable(self, table) -> pd.DataFrame:
+        '''
+This is a REQUIRED method.\n
+Logic to read in Issues table from user-selected database. 
+        '''
+        self.dbCursor.execute("SELECT * FROM " + table)
+        self.table_df = pd.DataFrame(self.dbCursor.fetchall())
+        column_names = [x[0] for x in self.dbCursor.description]
+        self.table_df.columns = column_names
+        return self.table_df
+    
+    def conductCalc(self, table: pd.DataFrame):
+        Conduct_Calculation.Logic(table, self.dbCursor, self.dbConnection).program()
+
+        
+    
 
 s = SSLMetrics()
 s.parseArgs()
 s.launch()
-s.obtainIssuesTable()
-print("hey SSL Metrics")
+issues_df = s.obtainTable("Issues")
+s.conductCalc(issues_df)
 sys.exit(0)

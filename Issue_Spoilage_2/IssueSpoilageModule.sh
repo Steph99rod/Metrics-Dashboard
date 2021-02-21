@@ -28,7 +28,7 @@ docker volume create $VOLUMENAME
 
 # Build and run docker volume, then get the container ID of the last ran container
 docker build . -t code
-docker run -v $VOLUMENAME:/metrics code $1 
+docker run -v $VOLUMENAME:/metrics code $1 $2
 
 CONTAINERID="$(docker ps -q -n 1)"
 
