@@ -43,6 +43,7 @@ Calls classes and methods to analyze and interpret data.
         '''
         TODO: make self.data equal to the information from the issues table 
         '''
+        
 
         repoConcptionDateTime = datetime.strptime(self.data[0]['created_at'].replace("T", " ").replace("Z", ""), "%Y-%m-%d %H:%M:%S")
         
@@ -102,60 +103,3 @@ Creates a list of datetimes from the repository conception datetime till today's
                 today = today - timedelta(days=1)
                 foo.append(str(today))
         return foo
-
-#     def get_Data(self) -> dict:
-#         '''
-# Returns the class variable data.
-#         '''
-#         return self.data
-
-#     def get_DbConnection(self) -> Connection:
-#         '''
-# Returns the class variable dbConnection.
-#         '''
-#         return self.dbConnection
-
-#     def get_DbCursor(self) -> Cursor:
-#         '''
-# Returns the class variable dbCursor.
-#         '''
-#         return self.dbCursor
-
-#     def get_GitHubRepo(self) -> str:
-#         '''
-# Returns the class variable githubRepo.
-#         '''
-#         return self.githubRepo
-
-#     def get_GitHubToken(self) -> str:
-#         '''
-# Returns the class variable githubToken.
-#         '''
-#         return self.githubToken
-
-#     def get_GitHubUser(self) -> str:
-#         '''
-# Returns the class variable githubUser.
-#         '''
-#         return self.githubUser
-
-    def set_Data(self) -> None:
-        '''
-This method is used to set the most recent GitHub API call into self.data.\n
-This data should be moved into it's own instance before this is called again in order to prevent the data from being overwritten.\n
-:param endpoint: This can be "commits", "issues", "pulls", "", or some other endpoint that is supported by the GitHub API as long as it is accessible with the root url https://api.github.com/{USER}/{REPOSITORY}
-        '''
-        # endpoint = endpoint.lower()
-        # self.gha = GitHubAPI(username=self.githubUser, repository=self.githubRepo, token=self.githubToken, tokenList=self.githubTokenList)
-        # if endpoint == "commits":
-            # self.data = [self.gha.access_GitHubRepoCommits(), self.gha.get_ResponseHeaders()]
-        # elif endpoint == "issues":
-        #     self.data = [self.gha.access_GitHubRepoIssues(), self.gha.get_ResponseHeaders()]
-        # elif endpoint == "pulls":
-        #     self.data = [self.gha.access_GitHubRepoPulls(), self.gha.get_ResponseHeaders()]
-        # elif endpoint == "":
-        #     self.data = [self.gha.access_GitHubAPISpecificEndpoint(endpoint=endpoint), self.gha.get_ResponseHeaders()]
-        # elif endpoint[0] == "/":
-        #     self.data = [self.gha.access_GitHubAPISpecificEndpoint(endpoint=endpoint), self.gha.get_ResponseHeaders()]
-        # else:
-        #     self.data = [self.gha.access_GitHubAPISpecificURL(url=endpoint), self.gha.get_ResponseHeaders()]
