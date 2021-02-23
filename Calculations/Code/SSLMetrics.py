@@ -1,5 +1,5 @@
 from sqlite3 import Cursor, Connection  # Need these for determining type
-import Conduct_Calculation
+import Issue_Calculations
 # from TokenHandler import TokenHandler
 import sqlite_database
 import sys
@@ -62,8 +62,8 @@ Logic to read in Issues table from user-selected database.
         self.table_df.columns = column_names
         return self.table_df
     
-    def conductCalc(self, table: pd.DataFrame):
-        Conduct_Calculation.Logic(table, self.dbCursor, self.dbConnection).program()
+    def conductIssuesCalc(self, table: pd.DataFrame):
+        Issue_Calculations.Logic(table, self.dbCursor, self.dbConnection).call_issue_spoilage_methods()
 
         
     
@@ -72,5 +72,5 @@ s = SSLMetrics()
 s.parseArgs()
 s.launch()
 issues_df = s.obtainTable("Issues")
-s.conductCalc(issues_df)
+s.conductIssuesCalc(issues_df)
 sys.exit(0)
