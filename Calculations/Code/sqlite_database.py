@@ -6,7 +6,7 @@ def open_connection(repo_name: str):
     Repo must exist in Metrics-Dashboard/Data-Collection/
     This is some SQL code that creates the tables and columns in a database named after the repository its data is holding.
     '''    
-    # ex: current_cwd = '/Users/name/Desktop/Code/Metrics/Metrics-Dashboard/Issue_Spoilage_2'
+    # ex: current_cwd = '/Users/name/Desktop/Code/Metrics/Metrics-Dashboard/Calculations'
     current_cwd = os.getcwd()
 
     # get the numerical position of the word "Metrics-Dashboard" 
@@ -36,34 +36,7 @@ def open_connection(repo_name: str):
 #             committer_date VARCHAR(3000),
 #             message VARCHAR(30000),
 #             comment_count VARCHAR(3000));''')
-    
-    # # Create table - ISSUES
-    # cursor.execute('''CREATE TABLE IF NOT EXISTS ISSUES
-    #         (user VARCHAR(3000) ,
-    #                 user_id VARCHAR(3000) ,
-    #                 issue_id VARCHAR(3000) ,
-    #                 comments_url VARCHAR(3000) ,
-    #                 node_id VARCHAR(3000) ,
-    #                 number VARCHAR(3000) ,
-    #                 title VARCHAR(3000) ,
-    #                 labels VARCHAR(3000) ,
-    #                 state VARCHAR(3000) ,
-    #                 locked VARCHAR(3000) ,
-    #                 assignee VARCHAR(3000) ,
-    #                 assignees VARCHAR(3000) ,
-    #                 comments VARCHAR(3000) ,
-    #                 created_at VARCHAR(3000) ,
-    #                 updated_at VARCHAR(3000) ,
-    #                 closed_at VARCHAR(3000) ,
-    #                 body VARCHAR(30000) ,
-    #                 comment_user VARCHAR(3000) ,
-    #                 comment_user_id VARCHAR(3000) ,
-    #                 comment_id VARCHAR(3000) ,
-    #                 issue_url VARCHAR(3000) ,
-    #                 comment_node_id VARCHAR(3000) ,
-    #                 comment_created_at VARCHAR(3000) ,
-    #                 comment_updated_at VARCHAR(3000) ,
-    #                 comment_body VARCHAR(3000)) ;''')
+
     # Create table - ISSUES
     cursor.execute('''CREATE TABLE IF NOT EXISTS ISSUES
             (user VARCHAR(3000) ,
@@ -93,7 +66,7 @@ def open_connection(repo_name: str):
                     comment_updated_at VARCHAR(3000) ,
                     comment_body VARCHAR(3000)) ;''')
 
-#             # Create table - PULL_REQUESTS
+# Create table - PULL_REQUESTS
 #     cursor.execute('''CREATE TABLE IF NOT EXISTS PULLREQUESTS
 #             (user VARCHAR(3000) ,
 #                     user_id VARCHAR(3000) ,

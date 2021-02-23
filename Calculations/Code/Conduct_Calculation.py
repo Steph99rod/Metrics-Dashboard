@@ -1,10 +1,8 @@
 from datetime import datetime, timedelta
-# from githubAPI import GitHubAPI
 from sqlite3 import Cursor, Connection
 import Issue_Spoilage
 import pandas as pd
 
-# import Lines_Of_Code_And_Num_Of_Chars
 
 class Logic:
     '''
@@ -40,9 +38,8 @@ Calls classes and methods to analyze and interpret data.
         
         # Index 0 = Current datetime, Index -1 = conception datetime
         datetimeList = self.generate_DateTimeList(rCDT=repoConcptionDateTime)
-        print(datetimeList)
-        exit()
-
+        # print(datetimeList)
+        # exit()
 
         Issue_Spoilage.Main(self.dbCursor, self.dbConnection, datetimeList)
 
