@@ -3,6 +3,7 @@ from sqlite3 import Cursor, Connection
 import pandas as pd
 
 
+
 class Logic:
     '''
 This is logic to call all other classes and methods that make the program run.\n
@@ -81,10 +82,34 @@ Initalizes the class and sets class variables that are to be used only in this c
             conn.commit()
 
             Min, Max, Avg = self.issue_spoilage_min_max_avg(c, conn, Issues, day)
-            # print("Min:" + str(Min) + " Max: " + str(Max) + " Avg: " + str(Avg))
 
-            sql = "INSERT INTO ISSUE_SPOILAGE (date, min, max, avg) VALUES (?,?,?,?);"
-            c.execute(sql, (str(day), str(Min), str(Max), str(Avg)))
+            sql = "PRAGMA table_info('Timed_Calculations');"
+            c.execute(sql)
+            column_names = c.fetchall()
+            current_issue_table_names = []
+            for row in column_names:
+                current_issue_table_names.append(row[1])
+            conn.commit()
+
+            # sql = "IF NOT EXISTS( SELECT Issue_Spoilage_Min FROM Issues ) THEN ALTER TABLE Timed_Calculations ADD Issue_Spoilage_Min varchar(3000) NOT NULL default '0'; END IF; "
+            if "Issue_Spoilage_Min" not in current_issue_table_names: 
+                sql = "ALTER TABLE Timed_Calculations ADD Issue_Spoilage_Min varchar(3000);"
+                c.execute(sql)
+                conn.commit()
+
+            if "Issue_Spoilage_Max" not in current_issue_table_names: 
+                sql = "ALTER TABLE Timed_Calculations ADD Issue_Spoilage_Max varchar(3000);"
+                c.execute(sql)
+                conn.commit()
+
+            if "Issue_Spoilage_Avg" not in current_issue_table_names: 
+                sql = "ALTER TABLE Timed_Calculations ADDEXISTS Issue_Spoilage_Avg varchar(3000);"
+                c.execute(sql)
+                conn.commit()
+
+            sql = "INSERT INTO Timed_Calculations (calendar_date, Issue_Spoilage_Min, Issue_Spoilage_Max, Issue_Spoilage_Avg) VALUES (?,?,?,?)"
+            sql += "ON CONFLICT(calendar_date) DO UPDATE SET Issue_Spoilage_Min = (?), Issue_Spoilage_Max = (?), Issue_Spoilage_Avg = (?);"
+            c.execute(sql, (str(day), str(Min), str(Max), str(Avg), str(Min), str(Max), str(Avg)))
             conn.commit()
 
     def generate_DateTimeList(self, rCDT: datetime) -> list:
@@ -118,25 +143,25 @@ Calls classes and methods to analyze and interpret data.
 
         self.insert_into_issue_spoilage_table(self.dbCursor, self.dbConnection, datetimeList)
 
-        # Adds all of the datetimes to the SQL database
-        # Bewary of changing
-        for foo in datetimeList:
+        # # Adds all of the datetimes to the SQL database
+        # # Bewary of changing
+        # for foo in datetimeList:
 
-            date = datetime.strptime(foo[:10], "%Y-%m-%d")
-            date = str(date)
+        #     date = datetime.strptime(foo[:10], "%Y-%m-%d")
+        #     date = str(date)
 
-            self.dbCursor.execute(
-                "SELECT Avg, Min, Max FROM Issue_Spoliage WHERE date(date) == date('" + date + "');")
-            rows = self.dbCursor.fetchall()
-            Avg = rows[0][0]
-            Min = rows[0][1]
-            Max = rows[0][2]
+        #     self.dbCursor.execute(
+        #         "SELECT Avg, Min, Max FROM Issue_Spoliage WHERE date(date) == date('" + date + "');")
+        #     rows = self.dbCursor.fetchall()
+        #     Avg = rows[0][0]
+        #     Min = rows[0][1]
+        #     Max = rows[0][2]
 
-            sql = "INSERT INTO Master (date, issue_spoilage_avg, issue_spoilage_min, issue_spoilage_max) VALUES (?,?,?,?) ON CONFLICT(date) DO UPDATE SET issue_spoilage_avg = (?), issue_spoilage_min = (?), issue_spoilage_max = (?);"
-            self.dbCursor.execute(
-                sql, (date, str(Avg), str(Min), str(Max), str(Avg), str(Min), str(Max)))
+        #     sql = "INSERT INTO Master (date, issue_spoilage_avg, issue_spoilage_min, issue_spoilage_max) VALUES (?,?,?,?) ON CONFLICT(date) DO UPDATE SET issue_spoilage_avg = (?), issue_spoilage_min = (?), issue_spoilage_max = (?);"
+        #     self.dbCursor.execute(
+        #         sql, (date, str(Avg), str(Min), str(Max), str(Avg), str(Min), str(Max)))
 
-            self.dbConnection.commit()
+        #     self.dbConnection.commit()
 
     # Issue Spoilage Methods Ends
     #--------------------------------------------------------------

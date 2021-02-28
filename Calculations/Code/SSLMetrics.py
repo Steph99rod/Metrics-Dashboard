@@ -1,6 +1,5 @@
 from sqlite3 import Cursor, Connection  # Need these for determining type
 import Issue_Calculations
-# from TokenHandler import TokenHandler
 import sqlite_database
 import sys
 import pandas as pd 
@@ -51,7 +50,7 @@ Logic to actually begin the analysis.
         '''
         self.dbCursor, self.dbConnection = sqlite_database.open_connection(self.db_input_location)
 
-    def obtainTable(self, table) -> pd.DataFrame:
+    def obtainTable(self, table: str) -> pd.DataFrame:
         '''
 This is a REQUIRED method.\n
 Logic to read in Issues table from user-selected database. 
@@ -62,7 +61,11 @@ Logic to read in Issues table from user-selected database.
         self.table_df.columns = column_names
         return self.table_df
     
-    def conductIssuesCalc(self, table: pd.DataFrame):
+    def conductIssuesCalc(self, table: pd.DataFrame) -> None:
+        '''
+Passes the table given to the Issue_Calculations class. 
+Add calculations to the Calculations table in the database. 
+        '''
         Issue_Calculations.Logic(table, self.dbCursor, self.dbConnection).call_issue_spoilage_methods()
 
         
