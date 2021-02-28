@@ -55,6 +55,30 @@ Initalizes the class and sets class variables that are to be used only in this c
         #First Pull down all of the values and loop through them one day at a time
         
         #Once table exists, pull down data here#
+        sql = "PRAGMA table_info('Timed_Calculations');"
+        c.execute(sql)
+        column_names = c.fetchall()
+        current_issue_table_names = []
+        for row in column_names:
+            current_issue_table_names.append(row[1])
+        conn.commit()
+
+        # sql = "IF NOT EXISTS( SELECT Issue_Spoilage_Min FROM Issues ) THEN ALTER TABLE Timed_Calculations ADD Issue_Spoilage_Min varchar(3000) NOT NULL default '0'; END IF; "
+        if "Issue_Spoilage_Min" not in current_issue_table_names: 
+            sql = "ALTER TABLE Timed_Calculations ADD Issue_Spoilage_Min varchar(3000);"
+            c.execute(sql)
+            conn.commit()
+
+        if "Issue_Spoilage_Max" not in current_issue_table_names: 
+            sql = "ALTER TABLE Timed_Calculations ADD Issue_Spoilage_Max varchar(3000);"
+            c.execute(sql)
+            conn.commit()
+
+        if "Issue_Spoilage_Avg" not in current_issue_table_names: 
+            sql = "ALTER TABLE Timed_Calculations ADDEXISTS Issue_Spoilage_Avg varchar(3000);"
+            c.execute(sql)
+            conn.commit()
+
 
         #Now loop!
         for day in days:
@@ -82,30 +106,6 @@ Initalizes the class and sets class variables that are to be used only in this c
             conn.commit()
 
             Min, Max, Avg = self.issue_spoilage_min_max_avg(c, conn, Issues, day)
-
-            sql = "PRAGMA table_info('Timed_Calculations');"
-            c.execute(sql)
-            column_names = c.fetchall()
-            current_issue_table_names = []
-            for row in column_names:
-                current_issue_table_names.append(row[1])
-            conn.commit()
-
-            # sql = "IF NOT EXISTS( SELECT Issue_Spoilage_Min FROM Issues ) THEN ALTER TABLE Timed_Calculations ADD Issue_Spoilage_Min varchar(3000) NOT NULL default '0'; END IF; "
-            if "Issue_Spoilage_Min" not in current_issue_table_names: 
-                sql = "ALTER TABLE Timed_Calculations ADD Issue_Spoilage_Min varchar(3000);"
-                c.execute(sql)
-                conn.commit()
-
-            if "Issue_Spoilage_Max" not in current_issue_table_names: 
-                sql = "ALTER TABLE Timed_Calculations ADD Issue_Spoilage_Max varchar(3000);"
-                c.execute(sql)
-                conn.commit()
-
-            if "Issue_Spoilage_Avg" not in current_issue_table_names: 
-                sql = "ALTER TABLE Timed_Calculations ADDEXISTS Issue_Spoilage_Avg varchar(3000);"
-                c.execute(sql)
-                conn.commit()
 
             sql = "INSERT INTO Timed_Calculations (calendar_date, Issue_Spoilage_Min, Issue_Spoilage_Max, Issue_Spoilage_Avg) VALUES (?,?,?,?)"
             sql += "ON CONFLICT(calendar_date) DO UPDATE SET Issue_Spoilage_Min = (?), Issue_Spoilage_Max = (?), Issue_Spoilage_Avg = (?);"
