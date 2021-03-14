@@ -35,11 +35,14 @@ Calls classes and methods to analyze and interpret data.
         self.insert_into_issue_spoilage_table(self.dbCursor, self.dbConnection, datetimeList)
     
     def issue_spoilage_min_max_avg(self, c, conn, Issues, day):
+        '''
+        Issues: list - a list of tuples, each tuple is a single issue with Created At at [0] and Closed At at [1]
+        day: date- the current date in the iteration of all days that the project has been open until the current date 
+        '''
         Issue_Spoilage = []
         total = 0
 
         for issue in Issues:
-            #print(issue)
             open_date = datetime.strptime(issue[0], "%Y-%m-%d")
             if(issue[1] == "None"):
                 Issue_Spoilage.append(day - open_date)
@@ -57,7 +60,7 @@ Calls classes and methods to analyze and interpret data.
             for i in Issue_Spoilage:
                 total = total + i
 
-            Avg = total / len(Issue_Spoilage)
+            Avg = round(total / len(Issue_Spoilage),2)
 
         return Min, Max, Avg
 
@@ -92,7 +95,6 @@ Calls classes and methods to analyze and interpret data.
             # print(day)
 
             day = datetime.strptime(str(day)[:10], "%Y-%m-%d")
-
             c.execute("SELECT date(created_at), date(closed_at) FROM ISSUES WHERE date(created_at) <= date('" + str(day) + "') AND date(closed_at) >= date('" + str(day) + "') OR date(created_at) <= date('" + str(day) + "') AND closed_at = 'None';")
             Issues = c.fetchall()
             conn.commit()
@@ -107,7 +109,8 @@ Calls classes and methods to analyze and interpret data.
     def generate_DateTimeList(self, rCDT: datetime) -> list:
         '''
 Creates a list of datetimes from the repository conception datetime till today's current datetime.\n
-:param rCDT: Repository conception datetime. This is found in the root api call of a repository.
+I.E. list of days (as datetime objects) from the date of the first commit until today. 
+:param rCDT: Repository conception datetime (date of first commit). This is found in the root api call of a repository.
         '''
         foo = []
         today = datetime.today()
@@ -135,6 +138,9 @@ class Other_Calculations:
         self.cur = dbCursor
 
     def main(self) -> None:
+        '''
+        Adds all calculations to the Calculations table.
+        '''
         
         # sql to insert calculations into table 
         sql = "INSERT INTO Calculations (calculation_name, description, value) VALUES (?,?,?)"
@@ -165,7 +171,7 @@ class Other_Calculations:
 
         closing_efficiency = self.get_closing_efficiency(int(total_issues), int(issues_closed))
         decription = "Number of Closed Issues / Total Number of Issues"
-        self.conn.execute(sql, ("Closing Efficiency", decription, closing_efficiency, decription, ratio) )
+        self.conn.execute(sql, ("Closing Efficiency", decription, closing_efficiency, decription, closing_efficiency) )
         self.conn.commit()
 
     def get_total_issues(self) -> int:
