@@ -66,7 +66,8 @@ Logic to read in Issues table from user-selected database.
 Passes the table given to the Issue_Calculations class. 
 Add calculations to the Calculations table in the database. 
         '''
-        Issue_Calculations.Logic(table, self.dbCursor, self.dbConnection).call_issue_spoilage_methods()
+        Issue_Calculations.Issue_Spoilage(table, self.dbCursor, self.dbConnection).main()
+        Issue_Calculations.Other_Calculations(table, self.dbCursor, self.dbConnection).main()
 
         
     

@@ -1,10 +1,12 @@
 from datetime import datetime, timedelta
 from sqlite3 import Cursor, Connection
 import pandas as pd
+import sqlite3 
 
+#--------------------------------------------------------------
+# Issue Spoilage Class
 
-
-class Logic:
+class Issue_Spoilage:
     '''
 This is logic to call all other classes and methods that make the program run.\n
 Does very little analysis of data.
@@ -21,9 +23,17 @@ Initalizes the class and sets class variables that are to be used only in this c
         self.dbCursor = cursor
         self.dbConnection = connection
         self.data = table
+
+    def main(self) -> None:
+        '''
+Calls classes and methods to analyze and interpret data.
+        '''
+        first_time_stamp = self.data.loc[0, "Created_At"].replace("T", " ").replace("Z", "")
+        repoConcptionDateTime = datetime.strptime(first_time_stamp, "%Y-%m-%d %H:%M:%S")
+        # Index 0 = Current datetime, Index -1 = conception datetime
+        datetimeList = self.generate_DateTimeList(rCDT=repoConcptionDateTime)
+        self.insert_into_issue_spoilage_table(self.dbCursor, self.dbConnection, datetimeList)
     
-    #--------------------------------------------------------------
-    # Issue Spoilage Methods
     def issue_spoilage_min_max_avg(self, c, conn, Issues, day):
         Issue_Spoilage = []
         total = 0
@@ -52,9 +62,8 @@ Initalizes the class and sets class variables that are to be used only in this c
         return Min, Max, Avg
 
     def insert_into_issue_spoilage_table(self, c, conn, days):
-        #First Pull down all of the values and loop through them one day at a time
         
-        #Once table exists, pull down data here#
+        # get all column names of the table Time_Calculations 
         sql = "PRAGMA table_info('Timed_Calculations');"
         c.execute(sql)
         column_names = c.fetchall()
@@ -63,7 +72,7 @@ Initalizes the class and sets class variables that are to be used only in this c
             current_issue_table_names.append(row[1])
         conn.commit()
 
-        # sql = "IF NOT EXISTS( SELECT Issue_Spoilage_Min FROM Issues ) THEN ALTER TABLE Timed_Calculations ADD Issue_Spoilage_Min varchar(3000) NOT NULL default '0'; END IF; "
+        # if the following names do not exist in the table, then add them as columns 
         if "Issue_Spoilage_Min" not in current_issue_table_names: 
             sql = "ALTER TABLE Timed_Calculations ADD Issue_Spoilage_Min varchar(3000);"
             c.execute(sql)
@@ -75,34 +84,17 @@ Initalizes the class and sets class variables that are to be used only in this c
             conn.commit()
 
         if "Issue_Spoilage_Avg" not in current_issue_table_names: 
-            sql = "ALTER TABLE Timed_Calculations ADDEXISTS Issue_Spoilage_Avg varchar(3000);"
+            sql = "ALTER TABLE Timed_Calculations ADD Issue_Spoilage_Avg varchar(3000);"
             c.execute(sql)
             conn.commit()
 
-
-        #Now loop!
         for day in days:
             # print(day)
-
-            Num_Of_Open_BF = "" #Fill this with the total number of open BF on that date
-            Num_Of_Open_FR = "" #Fill this with the total number of open FR on that date
-            Num_Of_Open_T = "" #Fill this with the total number of open T on that date
-            Num_Of_Closed_BF = "" #Fill this with the total number of closed BF on that date
-            Num_Of_Closed_FR = "" #Fill this with the total number of closed FR on that date
-            Num_Of_Closed_T = "" #Fill this with the total number of closed T on that date
-            DeDen_Open_BF = "" #Fill this with defect density of BF
-            DeDen_Open_FR = "" #Fill this with defect density of FR
-            DeDen_Open_T = "" #Fill this with defect density of T
-            IssSpoil_Open_BF = "" #Fill this with issue spoilage of BF
-            IssSpoil_Open_FR = "" #Fill this with issue spoilage of FR
-            IssSpoil_Open_T = "" #Fill this with issue spoilage of BT
-            Lines_Of_Code = "" #Store the lines of code on that specifc date
 
             day = datetime.strptime(str(day)[:10], "%Y-%m-%d")
 
             c.execute("SELECT date(created_at), date(closed_at) FROM ISSUES WHERE date(created_at) <= date('" + str(day) + "') AND date(closed_at) >= date('" + str(day) + "') OR date(created_at) <= date('" + str(day) + "') AND closed_at = 'None';")
             Issues = c.fetchall()
-            # print(Issues)
             conn.commit()
 
             Min, Max, Avg = self.issue_spoilage_min_max_avg(c, conn, Issues, day)
@@ -128,43 +120,102 @@ Creates a list of datetimes from the repository conception datetime till today's
                 foo.append(str(today))
         return foo
 
-    def call_issue_spoilage_methods(self) -> None:
-        '''
-Calls classes and methods to analyze and interpret data.
-        '''
+# Issue Spoilage class ends 
+#--------------------------------------------------------------
 
-        first_time_stamp = self.data.loc[0, "Created_At"].replace("T", " ").replace("Z", "")
-        repoConcptionDateTime = datetime.strptime(first_time_stamp, "%Y-%m-%d %H:%M:%S")
+class Other_Calculations:
+
+    def __init__(self, table, dbCursor, dbConnection) -> None:
+        ''' 
+        Initialize class variables
+        :param table: issues dataframe 
+        '''
+        self.conn = dbConnection
+        self.table = table
+        self.cur = dbCursor
+
+    def main(self) -> None:
         
-        # Index 0 = Current datetime, Index -1 = conception datetime
-        datetimeList = self.generate_DateTimeList(rCDT=repoConcptionDateTime)
-        # print(datetimeList)
-        # exit()
+        # sql to insert calculations into table 
+        sql = "INSERT INTO Calculations (calculation_name, description, value) VALUES (?,?,?)"
+        sql += "ON CONFLICT(calculation_name) DO UPDATE SET description = (?), value = (?);"
 
-        self.insert_into_issue_spoilage_table(self.dbCursor, self.dbConnection, datetimeList)
+        # insert total_issues into calculations table 
+        total_issues = str(self.get_total_issues())
+        decription = "Includes currently open and closed issues."
+        self.conn.execute(sql, ("Total Number of Issues", decription, total_issues, decription, total_issues) )
+        self.conn.commit()
 
-        # # Adds all of the datetimes to the SQL database
-        # # Bewary of changing
-        # for foo in datetimeList:
+        # insert open issues into calculations table 
+        issues_open = str(self.get_open_count())
+        decription = "Issues that do not have a Closed_At date."
+        self.conn.execute(sql, ("Number of Open Issues", decription, issues_open, decription, issues_open) )
+        self.conn.commit()
 
-        #     date = datetime.strptime(foo[:10], "%Y-%m-%d")
-        #     date = str(date)
+        # insert closed issues into calculations table 
+        issues_closed = str(self.get_closed_count())
+        decription = "Issues that have a Closed_At date."
+        self.conn.execute(sql, ("Number of Closed Issues", decription, issues_closed, decription, issues_closed) )
+        self.conn.commit()
 
-        #     self.dbCursor.execute(
-        #         "SELECT Avg, Min, Max FROM Issue_Spoliage WHERE date(date) == date('" + date + "');")
-        #     rows = self.dbCursor.fetchall()
-        #     Avg = rows[0][0]
-        #     Min = rows[0][1]
-        #     Max = rows[0][2]
+        ratio = str(round((int(issues_closed) / int(issues_open)),2))
+        decription = "Number of Closed Issues / Number of Open Issues"
+        self.conn.execute(sql, ("Closed to Open Ratio", decription, ratio, decription, ratio) )
+        self.conn.commit()
 
-        #     sql = "INSERT INTO Master (date, issue_spoilage_avg, issue_spoilage_min, issue_spoilage_max) VALUES (?,?,?,?) ON CONFLICT(date) DO UPDATE SET issue_spoilage_avg = (?), issue_spoilage_min = (?), issue_spoilage_max = (?);"
-        #     self.dbCursor.execute(
-        #         sql, (date, str(Avg), str(Min), str(Max), str(Avg), str(Min), str(Max)))
+        closing_efficiency = self.get_closing_efficiency(int(total_issues), int(issues_closed))
+        decription = "Number of Closed Issues / Total Number of Issues"
+        self.conn.execute(sql, ("Closing Efficiency", decription, closing_efficiency, decription, ratio) )
+        self.conn.commit()
 
-        #     self.dbConnection.commit()
+    def get_total_issues(self) -> int:
+        ''' 
+        Returns the total number of issues
+        '''
+        return self.table.shape[0]
 
-    # Issue Spoilage Methods Ends
-    #--------------------------------------------------------------
-    
+
+    def get_open_count(self):
+        ''' 
+        Returns the total number of open issues
+        '''
+        issues_still_open_df = self.table.astype(str)
+        issues_still_open_df = issues_still_open_df.loc[issues_still_open_df.Closed_At == "None"]
+        return issues_still_open_df.shape[0]
+
+    def get_closed_count(self):
+        ''' 
+        Returns the total number of closed issues
+        :param conn: The db connection
+        '''
+        issues_closed_df = self.table.astype(str)
+        issues_closed_df = issues_closed_df.loc[issues_closed_df.Closed_At != "None"]
+        return issues_closed_df.shape[0]
+
+
+    def get_closing_efficiency(self, total, closed_count) -> str:
+        ''' 
+        Returns efficiency, based on the principle of efficiency in physics, efficiency = output/input, where output = closed issues, input = total issues
+        :param conn: The db connection
+        '''
+        closing_efficiency = round((closed_count / total),2)
+        closing_efficiency_percent = closing_efficiency * 100
+        result = str(closing_efficiency_percent) + "%"
+        return result
+
+    # def get_avg_days_to_close_issue(self,conn: Connection) -> float:
+    #     ''' 
+    #     Returns average number of days it takes to close an Issue
+    #     :param conn: The db connection
+    #     '''
+    #     cur = conn.cursor()
+    #     query = "SELECT julianday(closed_at) - julianday(created_at) from ISSUES where state='closed'"
+    #     cur.execute(query)
+    #     result = cur.fetchall()
+    #     days = [i[0] for i in result]
+    #     avg = round((sum(days) / len(days)),2)
+    #     cur.close()
+    #     return avg
+        
 
 

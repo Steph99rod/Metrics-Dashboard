@@ -31,9 +31,10 @@ def open_connection(repo_name: str):
     # create the calculations table 
     cursor.execute('''CREATE TABLE IF NOT EXISTS Calculations
             (
-                ID VARCHAR(3000) ,
                 calculation_name VARCHAR(3000), 
-                description VARCHAR(3000) 
+                description VARCHAR(3000),
+                value VARCHAR(3000),
+                PRIMARY KEY (calculation_name)
             ) ;''')
     
     # columns are to be added to the table using "alter table" to add calculations as their own column 
